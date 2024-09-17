@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mic, Image, Paperclip, Send, Sun, Moon } from "lucide-react";
+import { Mic, Paperclip, Send, Sun, Moon } from "lucide-react";
 
 type Message = {
    id: number;
@@ -122,9 +122,11 @@ export function ChatWidget(props: ChatWidgetProps) {
                <Button size="icon" variant="outline" aria-label="Upload file">
                   <Paperclip className="h-4 w-4" />
                </Button>
-               <Button size="icon" variant="outline" aria-label="Upload image">
-                  <Image className="h-4 w-4" />
-               </Button>
+               <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Upload image"
+               ></Button>
                <Button size="icon" variant="outline" aria-label="Record audio">
                   <Mic className="h-4 w-4" />
                </Button>
