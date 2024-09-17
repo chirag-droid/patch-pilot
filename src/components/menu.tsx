@@ -43,7 +43,9 @@ export function Menu() {
                   <MenubarItem onSelect={() => {}}>Dashboard</MenubarItem>
                </Link>
                <MenubarSeparator />
-               <MenubarItem onSelect={() => {}}>Settings ...</MenubarItem>
+               <MenubarItem>
+                  <Link href="/settings">Settings...</Link>
+               </MenubarItem>
                <MenubarItem onSelect={() => {}}>Logout</MenubarItem>
             </MenubarContent>
          </MenubarMenu>
