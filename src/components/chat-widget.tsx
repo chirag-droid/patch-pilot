@@ -21,6 +21,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useApiURL } from "@/hooks/use-api-url";
 import { cn } from "@/lib/utils";
 import Markdown from "react-markdown";
+import { useChatToggle } from "@/hooks/use-chat-toggle";
+import { Message, useMessagesStore } from "@/hooks/use-messages";
 
 const chatConfig = {
    dimensions: {
@@ -90,7 +92,7 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
    children,
    ...props
 }) => {
-   const [isOpen, setIsOpen] = useState(false);
+   const { isOpen, setIsOpen } = useChatToggle();
    const chatRef = useRef<HTMLDivElement>(null);
 
    const toggleChat = () => setIsOpen(!isOpen);
@@ -132,29 +134,11 @@ const ExpandableChat: React.FC<ExpandableChatProps> = ({
    );
 };
 
-interface Message {
-   id: string;
-   content: string;
-   sender: "user" | "ai";
-   timestamp: string;
-}
-
-const initialChatSupportMessages: Message[] = [
-   {
-      id: "1",
-      content: "Hello! How can I help you today?",
-      sender: "ai",
-      timestamp: new Date().toLocaleTimeString(),
-   },
-];
-
 export function ChatWidget() {
    const { url } = useApiURL();
-   console.log({ url });
 
-   const [messages, setMessages] = useState<Message[]>(
-      initialChatSupportMessages
-   );
+   const { messages, addMessage, addResponse } = useMessagesStore();
+
    const [inputMessage, setInputMessage] = useState("");
 
    const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -174,8 +158,8 @@ export function ChatWidget() {
             sender: "user",
             timestamp: new Date().toLocaleTimeString(),
          };
+         addMessage(newMessage);
          askAI(inputMessage);
-         setMessages((_messages) => [..._messages, newMessage]);
          setInputMessage("");
       }
    };
@@ -201,13 +185,7 @@ export function ChatWidget() {
       }
 
       const data = await response.json();
-      const answer: Message = {
-         id: Date.now().toString(),
-         content: data.answer,
-         sender: "ai",
-         timestamp: new Date().toLocaleTimeString(),
-      };
-      setMessages((_messages) => [..._messages, answer]);
+      addResponse(data.answer);
    };
 
    return (

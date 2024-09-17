@@ -24,6 +24,8 @@ import {
    TableRow,
 } from "@/components/ui/table";
 import { SparklesIcon } from "lucide-react";
+import { useChatToggle } from "@/hooks/use-chat-toggle";
+import { Message, useMessagesStore } from "@/hooks/use-messages";
 
 interface Threat {
    "CVE-id": string;
@@ -164,11 +166,31 @@ const columns: ColumnDef<Threat>[] = [
    },
    {
       id: "ai",
-      cell: ({}) => (
-         <SparklesIcon className="h-4 w-4 opacity-60 cursor-pointer hover:opacity-100" />
-      ),
+      cell: ({ row }) => <AskThreat threat={row.original} />,
    },
 ];
+
+export function AskThreat(props: { threat: Threat }) {
+   const { setIsOpen } = useChatToggle();
+   const { addMessage } = useMessagesStore();
+
+   const newMessage: Message = {
+      id: Date.now().toString(),
+      content: `I need help with ${props.threat["CVE-id"]}`,
+      sender: "user",
+      timestamp: new Date().toLocaleTimeString(),
+   };
+
+   return (
+      <SparklesIcon
+         onClick={() => {
+            setIsOpen(true);
+            addMessage(newMessage);
+         }}
+         className="h-4 w-4 opacity-60 cursor-pointer hover:opacity-100"
+      />
+   );
+}
 
 export function ThreatDetails() {
    const table = useReactTable({
