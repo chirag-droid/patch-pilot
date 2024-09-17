@@ -1,15 +1,10 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
-   BriefcaseMedical,
    BugIcon,
    FilesIcon,
    HelpCircleIcon,
-   Laptop,
    LayoutGridIcon,
-   LineChartIcon,
-   Settings2,
    SettingsIcon,
    ShieldIcon,
    TriangleAlertIcon,

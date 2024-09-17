@@ -16,7 +16,8 @@ import {
    ChartTooltip,
    ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Meteors } from "./ui/meteors";
+import { DesktopIcon, MobileIcon } from "@radix-ui/react-icons";
+import { TvIcon } from "lucide-react";
 
 export const description = "An interactive bar chart";
 
@@ -121,14 +122,17 @@ const chartConfig = {
    desktop: {
       label: "Desktop",
       color: "hsl(var(--chart-1))",
+      icon: () => <DesktopIcon />,
    },
    mobile: {
       label: "Mobile",
       color: "hsl(var(--chart-2))",
+      icon: () => <MobileIcon />,
    },
    iot: {
       label: "IOT Devices",
       color: "hsl(var(--chart-3))",
+      icon: () => <TvIcon />,
    },
 } satisfies ChartConfig;
 

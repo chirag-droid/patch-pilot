@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/card";
 export const description = "An interactive bar chart";
 
-import { Circle } from "lucide-react";
-
 const CircleSliderThreatRating = ({ rating }: { rating: number }) => {
    const normalizedRating = Math.min(Math.max(rating, 0), 100);
    const circumference = 2 * Math.PI * 45; // 45 is the radius of our circle
