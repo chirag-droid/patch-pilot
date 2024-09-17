@@ -1,9 +1,6 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { ThreatSummary } from "@/components/threat-summary";
-import { ThreatDetails } from "@/components/threat-details";
-import { ThreatRating } from "@/components/threat-rating";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Settings() {
