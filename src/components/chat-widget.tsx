@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/chat/expandable-chat";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { AnimatePresence, motion } from "framer-motion";
+import { useApiURL } from "@/hooks/use-api-url";
 
 interface Message {
    id: string;
@@ -35,6 +36,9 @@ const initialChatSupportMessages: Message[] = [
 ];
 
 export function ChatWidget() {
+   const { url } = useApiURL();
+   console.log({ url });
+
    const [messages, setMessages] = useState<Message[]>(
       initialChatSupportMessages
    );
@@ -57,7 +61,8 @@ export function ChatWidget() {
             sender: "user",
             timestamp: new Date().toLocaleTimeString(),
          };
-         setMessages([...messages, newMessage]);
+         askAI(inputMessage);
+         setMessages((_messages) => [..._messages, newMessage]);
          setInputMessage("");
       }
    };
@@ -69,6 +74,29 @@ export function ChatWidget() {
       }
    };
 
+   const askAI = async (question: string) => {
+      const response = await fetch(`${url}/ask`, {
+         method: "POST",
+         headers: {
+            "Content-Type": "application/json",
+         },
+         body: JSON.stringify({ question }),
+      });
+
+      if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const answer: Message = {
+         id: Date.now().toString(),
+         content: data.answer,
+         sender: "ai",
+         timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages((_messages) => [..._messages, answer]);
+   };
+
    return (
       <ExpandableChat
          icon={<Bot className="h-6 w-6" />}
@@ -78,10 +106,6 @@ export function ChatWidget() {
          <ExpandableChatHeader className="flex-col text-center justify-center">
             <h1 className="text-xl font-semibold">Chat with our AI ✨</h1>
             <p>Ask any question for our AI to answer</p>
-            <div className="flex gap-2 items-center pt-2">
-               <Button variant="secondary">New Chat</Button>
-               <Button variant="secondary">See FAQ</Button>
-            </div>
          </ExpandableChatHeader>
          <ExpandableChatBody>
             <ChatMessageList

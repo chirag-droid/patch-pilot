@@ -14,7 +14,6 @@ import { useSidebarStore } from "@/store/use-sidebar-store";
 import { cn } from "@/lib/utils";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { useThemeStore } from "@/hooks/use-theme";
-import { useEffect } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ChatWidget } from "@/components/chat-widget";
 
@@ -55,7 +54,7 @@ export default function RootLayout({
                         className="flex-grow items-stretch"
                      >
                         <ResizablePanel
-                           defaultSize={4}
+                           defaultSize={12}
                            minSize={12}
                            maxSize={16}
                            className={cn(
