@@ -23,6 +23,7 @@ import {
    TableHeader,
    TableRow,
 } from "@/components/ui/table";
+import { SparklesIcon } from "lucide-react";
 
 interface Threat {
    "CVE-id": string;
@@ -160,6 +161,12 @@ const columns: ColumnDef<Threat>[] = [
    {
       accessorKey: "Agent Name",
       header: "Agent Name",
+   },
+   {
+      id: "ai",
+      cell: ({}) => (
+         <SparklesIcon className="h-4 w-4 opacity-60 cursor-pointer hover:opacity-100" />
+      ),
    },
 ];
 
