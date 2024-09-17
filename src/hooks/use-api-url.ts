@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 interface ApiState {
    url?: string;
-   setApiURL: (to: string) => void;
+   setApiURL: (to: string | undefined) => void;
 }
 
 export const useApiURL = create<ApiState>((set) => ({
