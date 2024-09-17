@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/menubar";
 import { toggleSidebarVisibility } from "@/store/use-sidebar-store";
 import Link from "next/link";
+import { ThemeSwitcher } from "./theme-switcher";
 
 export function Menu() {
    const toggleFullscreen = () => {
@@ -133,6 +134,10 @@ export function Menu() {
                <MenubarItem inset>Add Profile...</MenubarItem>
             </MenubarContent>
          </MenubarMenu>
+
+         <div className="hidden p-1 w-full sm:flex items-center justify-end">
+            <ThemeSwitcher />
+         </div>
       </Menubar>
    );
 }

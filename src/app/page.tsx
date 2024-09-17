@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { ThreatSummary } from "@/components/threat-summary";
 import { ThreatDetails } from "@/components/threat-details";
 import { ThreatRating } from "@/components/threat-rating";
+import { ChatWidget } from "@/components/chat-widget";
 
 export default function Dashboard() {
    return (
@@ -31,6 +32,8 @@ export default function Dashboard() {
 
             <ThreatDetails />
          </div>
+
+         <ChatWidget />
       </main>
    );
 }

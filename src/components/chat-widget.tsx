@@ -1,149 +1,169 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mic, Paperclip, Send, Sun, Moon } from "lucide-react";
+import { Bot, Send } from "lucide-react";
+import {
+   ChatBubble,
+   ChatBubbleAvatar,
+   ChatBubbleMessage,
+} from "@/components/ui/chat/chat-bubble";
+import { ChatInput } from "@/components/ui/chat/chat-input";
+import {
+   ExpandableChat,
+   ExpandableChatHeader,
+   ExpandableChatBody,
+   ExpandableChatFooter,
+} from "@/components/ui/chat/expandable-chat";
+import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
+import { AnimatePresence, motion } from "framer-motion";
 
-type Message = {
-   id: number;
-   text: string;
-   sender: "user" | "bot";
-   type: "text" | "image" | "audio" | "file";
-};
+interface Message {
+   id: string;
+   content: string;
+   sender: "user" | "ai";
+   timestamp: string;
+}
 
-type ChatWidgetProps = {
-   className?: string;
-};
+const initialChatSupportMessages: Message[] = [
+   {
+      id: "1",
+      content: "Hello! How can I help you today?",
+      sender: "ai",
+      timestamp: new Date().toLocaleTimeString(),
+   },
+];
 
-export function ChatWidget(props: ChatWidgetProps) {
-   const [messages, setMessages] = useState<Message[]>([]);
-   const [inputText, setInputText] = useState("");
-   const [isDarkMode, setIsDarkMode] = useState(false);
+export function ChatWidget() {
+   const [messages, setMessages] = useState<Message[]>(
+      initialChatSupportMessages
+   );
+   const [inputMessage, setInputMessage] = useState("");
 
-   const handleSendMessage = async () => {
-      if (inputText.trim()) {
-         const newMessage: Message = {
-            id: Date.now(),
-            text: inputText,
-            sender: "user",
-            type: "text",
-         };
-         setMessages([...messages, newMessage]);
-         setInputText("");
-
-         try {
-            const response = await fetch("/api/send_message", {
-               method: "POST",
-               headers: {
-                  "Content-Type": "application/json",
-               },
-               body: JSON.stringify({ message: inputText }),
-            });
-            const data = await response.json();
-            const botResponse: Message = {
-               id: Date.now() + 1,
-               text: data.response,
-               sender: "bot",
-               type: "text",
-            };
-            setMessages((prevMessages) => [...prevMessages, botResponse]);
-         } catch (error) {
-            console.error("Error sending message:", error);
-         }
-      }
-   };
+   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
    useEffect(() => {
-      // Scroll to bottom of chat when new messages are added
-      const chatContainer = document.getElementById("chat-container");
-      if (chatContainer) {
-         chatContainer.scrollTop = chatContainer.scrollHeight;
+      if (messagesContainerRef.current) {
+         messagesContainerRef.current.scrollTop =
+            messagesContainerRef.current.scrollHeight;
       }
    }, [messages]);
 
+   const handleSendMessage = () => {
+      if (inputMessage.trim()) {
+         const newMessage: Message = {
+            id: Date.now().toString(),
+            content: inputMessage,
+            sender: "user",
+            timestamp: new Date().toLocaleTimeString(),
+         };
+         setMessages([...messages, newMessage]);
+         setInputMessage("");
+      }
+   };
+
+   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+         e.preventDefault();
+         handleSendMessage();
+      }
+   };
+
    return (
-      <div
-         className={`flex flex-col ${
-            isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-         } ${props.className}`}
+      <ExpandableChat
+         icon={<Bot className="h-6 w-6" />}
+         size="lg"
+         position="bottom-right"
       >
-         <header className="flex justify-between items-center p-4 border-b">
-            <h1 className="text-2xl font-bold">Smart Chatbot</h1>
-            <div className="flex items-center space-x-2">
-               <span>
-                  {isDarkMode ? (
-                     <Moon className="h-5 w-5" />
-                  ) : (
-                     <Sun className="h-5 w-5" />
-                  )}
-               </span>
-               <Switch
-                  checked={isDarkMode}
-                  onCheckedChange={setIsDarkMode}
-                  aria-label="Toggle dark mode"
-               />
+         <ExpandableChatHeader className="flex-col text-center justify-center">
+            <h1 className="text-xl font-semibold">Chat with our AI ✨</h1>
+            <p>Ask any question for our AI to answer</p>
+            <div className="flex gap-2 items-center pt-2">
+               <Button variant="secondary">New Chat</Button>
+               <Button variant="secondary">See FAQ</Button>
             </div>
-         </header>
-         <main
-            id="chat-container"
-            className="flex-1 overflow-y-auto p-4 space-y-4"
-         >
-            {messages.map((message) => (
-               <div
-                  key={message.id}
-                  className={`flex ${
-                     message.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-               >
-                  <div
-                     className={`max-w-xs md:max-w-md lg:max-w-lg xl:max-w-xl rounded-lg p-3 ${
-                        message.sender === "user"
-                           ? "bg-blue-500 text-white"
-                           : isDarkMode
-                           ? "bg-gray-800"
-                           : "bg-white"
-                     } shadow-md animate-fade-in`}
-                  >
-                     {message.sender === "bot" && (
-                        <Avatar className="h-8 w-8 mb-2">
-                           <AvatarImage src="/bot-avatar.png" alt="Bot" />
-                           <AvatarFallback>Bot</AvatarFallback>
-                        </Avatar>
-                     )}
-                     <p>{message.text}</p>
-                  </div>
-               </div>
-            ))}
-         </main>
-         <footer className="p-4 border-t">
-            <div className="flex space-x-2 mb-2">
-               <Button size="icon" variant="outline" aria-label="Upload file">
-                  <Paperclip className="h-4 w-4" />
-               </Button>
+         </ExpandableChatHeader>
+         <ExpandableChatBody>
+            <ChatMessageList
+               ref={messagesContainerRef}
+               className="dark:bg-muted/40"
+            >
+               <AnimatePresence>
+                  {messages.map((message, index) => {
+                     return (
+                        <motion.div
+                           key={index}
+                           layout
+                           initial={{ opacity: 0, scale: 1, y: 10, x: 0 }}
+                           animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+                           exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
+                           transition={{
+                              opacity: { duration: 0.1 },
+                              layout: {
+                                 type: "spring",
+                                 bounce: 0.3,
+                                 duration: index * 0.05 + 0.2,
+                              },
+                           }}
+                           style={{ originX: 0.5, originY: 0.5 }}
+                           className="flex flex-col"
+                        >
+                           <ChatBubble
+                              key={message.id}
+                              variant={
+                                 message.sender === "user" ? "sent" : "received"
+                              }
+                           >
+                              <ChatBubbleAvatar
+                                 src={
+                                    message.sender === "user"
+                                       ? "https://avatars.githubusercontent.com/u/114422072?s=400&u=8a176a310ca29c1578a70b1c33bdeea42bf000b4&v=4"
+                                       : ""
+                                 }
+                                 fallback={
+                                    message.sender === "user" ? "US" : "🤖"
+                                 }
+                              />
+                              <ChatBubbleMessage
+                                 variant={
+                                    message.sender === "user"
+                                       ? "sent"
+                                       : "received"
+                                 }
+                              >
+                                 {message.content}
+                              </ChatBubbleMessage>
+                           </ChatBubble>
+                        </motion.div>
+                     );
+                  })}
+               </AnimatePresence>
+            </ChatMessageList>
+         </ExpandableChatBody>
+         <ExpandableChatFooter>
+            <form
+               onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+               }}
+               className="flex relative gap-2"
+            >
+               <ChatInput
+                  onKeyDown={onKeyDown}
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Type a message..."
+               />
                <Button
+                  disabled={!inputMessage.trim()}
+                  type="submit"
                   size="icon"
-                  variant="outline"
-                  aria-label="Upload image"
-               ></Button>
-               <Button size="icon" variant="outline" aria-label="Record audio">
-                  <Mic className="h-4 w-4" />
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 shrink-0"
+               >
+                  <Send className="size-4" />
                </Button>
-            </div>
-            <div className="flex space-x-2">
-               <Textarea
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1"
-                  rows={1}
-               />
-               <Button onClick={handleSendMessage} aria-label="Send message">
-                  <Send className="h-4 w-4" />
-               </Button>
-            </div>
-         </footer>
-      </div>
+            </form>
+         </ExpandableChatFooter>
+      </ExpandableChat>
    );
 }
